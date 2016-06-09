@@ -1,4 +1,4 @@
-node-omron-hvc-p
+j5-lvserial
 ====
 Johnny-five plugin for servo motors with LVSerial protocol provided by V-Stone.
 
