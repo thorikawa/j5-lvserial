@@ -15,7 +15,6 @@ export default function(five) {
 				this, opts = five.Board.Options(opts)
 			);
 
-
 			var state = {
 				portId: opts.portId || this.io.SERIAL_PORT_IDs.DEFAULT,
 				baud: opts.baud || 115200,
@@ -28,19 +27,27 @@ export default function(five) {
 				if (Number.isInteger(this.pins.rx)) rx = this.pins.rx;
 				if (Number.isInteger(this.pins.tx)) tx = this.pins.tx;
 			}
-			this.io.serialConfig({
+
+			for (let pin of [rx, tx]) {
+				this.io.pinMode(pin, this.io.MODES.SERIAL);
+			}
+
+			let serialConfig = {
 				portId: state.portId, 
 				baud: state.baud,
 				rxPin: rx,
 				txPin: tx,
-			});
+			};
 
-			this.io.serialRead(state.portId, (bytes) => {
-				// read bytes and determine event types to emit
-				// store received things in state object, use
-				// for emitting events 
-				// 
-				console.log(bytes);
+			this.io.serialConfig(serialConfig);
+
+			process.nextTick(() => {
+				this.io.serialRead(state.portId, (bytes) => {
+					// read bytes and determine event types to emit
+					// store received things in state object, use
+					// for emitting events 
+					// TODO
+				});
 			});
 
 			Object.defineProperties(this, {
@@ -52,7 +59,6 @@ export default function(five) {
 
 		Component.prototype.write = function(bytes) {
 			let state = priv.get(this);
-			console.log(state.portId, bytes);
 			this.io.serialWrite(state.portId, bytes);
 		};
 
@@ -87,10 +93,10 @@ export default function(five) {
 
 		Component.prototype.move = function(sid=0, tpos) {
 			if (tpos < 0x200 || tpos > 0xe00) {
-				console.error('tpos value is out of range. Please specify the value from 0x200 to 0xe00.');
+				console.warn('tpos value is out of range. Please specify the value from 0x200 to 0xe00.');
 				return;
 			}
-			this.flashWrite(sid, 0x30, [tpos & 0x7f, tpos >> 7]);
+			this.flashWrite(sid, 0x30, [tpos & 0x7f, (tpos >> 7) & 0x7f]);
 		};
 
 		return Component;

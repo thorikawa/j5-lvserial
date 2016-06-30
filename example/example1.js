@@ -2,10 +2,9 @@
 
 let five = require('johnny-five');
 let LvSerial = require('../')(five);
-let board = new five.Board();
+let board = new five.Board({});
 
 board.on('ready', () => {
-	console.log('ready');
 	let vservo = new LvSerial({
 		pins: {
 			rx: 11,
