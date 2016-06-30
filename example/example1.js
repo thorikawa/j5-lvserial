@@ -15,12 +15,19 @@ board.on('ready', () => {
 		vservo.unlock();
 	}, 200);
 	setTimeout(() => {
+		console.log('motor on');
 		vservo.motorOn();
 	}, 400);
 	setTimeout(() => {
+		console.log('move to 0x500');
 		vservo.move(0, 0x500);
 	}, 2000);
 	setTimeout(() => {
+		console.log('move to 0xa00');
 		vservo.move(0, 0xa00);
 	}, 4000);
+	setTimeout(() => {
+		console.log('motor off');
+		vservo.motorOff();
+	}, 5000);
 });
