@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "dependencies": {},
-  "description": "j5-lvserial ==== Node module for controlling OMRON HVC-P",
+  "description": "Johnny-five plugin for servo motors which support LVSerial protocol provided by Vstone.",
   "directories": {
     "example": "example"
   },
