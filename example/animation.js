@@ -10,6 +10,7 @@ board.on('ready', () => {
 			rx: 11,
 			tx: 10
 		},
+		sid: 0,
 		repl: false
 	});
 	let animation = new five.Animation(vservo);
