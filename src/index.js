@@ -121,6 +121,16 @@ export default function(five) {
 		};
 
 		Component.prototype[Animation.normalize] = function(keyFrames) {
+			// There are a couple of properties that are device type sepcific
+			// that we need to convert to something generic
+			keyFrames.forEach(function(keyFrame) {
+				if (typeof keyFrame.degrees !== "undefined") {
+					keyFrame.value = keyFrame.degrees;
+				}
+				if (typeof keyFrame.copyDegrees !== "undefined") {
+					keyFrame.copyValue = keyFrame.copyDegrees;
+				}
+			});
 			return keyFrames;
 		};
 
