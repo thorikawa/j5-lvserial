@@ -4,7 +4,16 @@ var Emitter = require("events").EventEmitter;
 var util = require("util");
 var priv = new Map();
 
+const FB_TPOS_DEFAULT_MIN = 0x0200;
+const FB_TPOS_DEFAULT_MAX = 0x0e00;
+const FB_TPOS_DEFAULT_CENTER = 0x0800;
+const DEGREE_DEFAULT_MIN = 15;
+const DEGREE_DEFAULT_MAX = 345;
+
 export default function(five) {
+	let Fn = five.Fn;
+	let Animation = five.Animation;
+
 	return (function() {
 		function Component(opts) {
 			if (!(this instanceof Component)) {
@@ -15,9 +24,11 @@ export default function(five) {
 				this, opts = five.Board.Options(opts)
 			);
 
+			this.sid = opts.sid || 0;
+
 			var state = {
 				portId: opts.portId || this.io.SERIAL_PORT_IDs.DEFAULT,
-				baud: opts.baud || 115200,
+				baud: opts.baud || 115200
 			};
 
 			priv.set(this, state);
@@ -26,10 +37,6 @@ export default function(five) {
 			if (this.pins) {
 				if (Number.isInteger(this.pins.rx)) rx = this.pins.rx;
 				if (Number.isInteger(this.pins.tx)) tx = this.pins.tx;
-			}
-
-			for (let pin of [rx, tx]) {
-				this.io.pinMode(pin, this.io.MODES.SERIAL);
 			}
 
 			let serialConfig = {
@@ -57,46 +64,64 @@ export default function(five) {
 
 		util.inherits(Component, Emitter);
 
-		Component.prototype.write = function(bytes) {
+		Component.prototype.serialWrite = function(bytes) {
 			let state = priv.get(this);
 			this.io.serialWrite(state.portId, bytes);
 		};
 
-		Component.prototype.flashWrite = function(sid, address, data) {
+		Component.prototype.flashWrite = function(address, data) {
 			let len = data.length;
 			let buf = new Buffer(3 + len);
-			buf[0] = 0x80 | sid;
+			buf[0] = 0x80 | this.sid;
 			buf[1] = 0x40 | 0x00 | len;
 			buf[2] = address;
 			let offset = 3;
 			for (let d of data) {
 				buf[offset++] = d;
 			}
-			this.write(buf);
+			this.serialWrite(buf);
 		};
 
-		Component.prototype.unlock = function(sid=0) {
-			this.flashWrite(sid, 0x14, [0x55]);
+		Component.prototype.unlock = function() {
+			this.flashWrite(0x14, [0x55]);
 		};
 
-		Component.prototype.motorToggle = function(sid=0, on) {
-			this.flashWrite(sid, 0x3b, [on ? 1 : 0]);
+		Component.prototype.motorToggle = function(on) {
+			this.flashWrite(0x3b, [on ? 1 : 0]);
 		};
 
-		Component.prototype.motorOn = function(sid=0) {
-			this.motorToggle(sid, true);
+		Component.prototype.motorOn = function() {
+			this.motorToggle(true);
 		};
 
-		Component.prototype.motorOff = function(sid=0) {
-			this.motorToggle(sid, false);
+		Component.prototype.motorOff = function() {
+			this.motorToggle(false);
 		};
 
-		Component.prototype.move = function(sid=0, tpos) {
-			if (tpos < 0x200 || tpos > 0xe00) {
-				console.warn('tpos value is out of range. Please specify the value from 0x200 to 0xe00.');
+		Component.prototype.move = function(tpos) {
+			tpos = parseInt(tpos);
+			if (tpos < FB_TPOS_DEFAULT_MIN || tpos > FB_TPOS_DEFAULT_MAX) {
+				console.warn(`tpos value is out of range. Please specify the value from ${FB_TPOS_DEFAULT_MIN} to ${FB_TPOS_DEFAULT_MAX}.`);
 				return;
 			}
-			this.flashWrite(sid, 0x30, [tpos & 0x7f, (tpos >> 7) & 0x7f]);
+			this.flashWrite(0x30, [tpos & 0x7f, (tpos >> 7) & 0x7f]);
+		};
+
+		Component.prototype.to = function(degree) {
+			if (degree < DEGREE_DEFAULT_MIN || degree > DEGREE_DEFAULT_MAX) {
+				console.warn(`The degree is out of range. Please specify the value from ${DEGREE_DEFAULT_MIN} to ${DEGREE_DEFAULT_MAX}.`);
+				return;
+			}
+			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
+			this.move(tpos);
+		};
+
+		Component.prototype[Animation.render] = function(position) {
+			return this.to(position[0]);
+		};
+
+		Component.prototype[Animation.normalize] = function(keyFrames) {
+			return keyFrames;
 		};
 
 		return Component;

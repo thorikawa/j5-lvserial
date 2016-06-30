@@ -20,11 +20,11 @@ board.on('ready', () => {
 	}, 400);
 	setTimeout(() => {
 		console.log('move to 0x500');
-		vservo.move(0, 0x500);
+		vservo.to(0, 30);
 	}, 2000);
 	setTimeout(() => {
 		console.log('move to 0xa00');
-		vservo.move(0, 0xa00);
+		vservo.to(0, 300);
 	}, 4000);
 	setTimeout(() => {
 		console.log('motor off');
