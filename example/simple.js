@@ -21,12 +21,16 @@ board.on('ready', () => {
 		vservo.motorOn();
 	}, 400);
 	setTimeout(() => {
-		console.log('move to 0x500');
+		console.log('move to 30 degree');
 		vservo.to(30);
 	}, 2000);
 	setTimeout(() => {
-		console.log('move to 0xa00');
+		console.log('move to 300 degree');
 		vservo.to(300);
+	}, 3000);
+	setTimeout(() => {
+		console.log('move to 180 degree');
+		vservo.to(180);
 	}, 4000);
 	setTimeout(() => {
 		console.log('motor off');
