@@ -54,6 +54,7 @@ export default function(five) {
 					// store received things in state object, use
 					// for emitting events 
 					// TODO
+					console.log(bytes);
 				});
 			});
 
@@ -65,11 +66,12 @@ export default function(five) {
 		util.inherits(Component, Emitter);
 
 		Component.prototype.serialWrite = function(bytes) {
+			console.log(bytes);
 			let state = priv.get(this);
 			this.io.serialWrite(state.portId, bytes);
 		};
 
-		Component.prototype.flashWrite = function(address, data) {
+		Component.prototype.ramWrite = function(address, data) {
 			let len = data.length;
 			let buf = new Buffer(3 + len);
 			buf[0] = 0x80 | this.sid;
@@ -82,12 +84,41 @@ export default function(five) {
 			this.serialWrite(buf);
 		};
 
+		Component.prototype.ramRead = function(address, len) {
+			let buf = new Buffer(3 + len);
+			buf[0] = 0x80 | this.sid;
+			buf[1] = 0x00 | 0x20 | len;
+			buf[2] = address;
+			for (let i = 0; i < len; i++) {
+				buf[3 + i] = 0x00;
+			}
+			this.serialWrite(buf);
+		};
+
+		Component.prototype.flashWrite = function(address,  data) {
+			let len = data.length;
+			let buf = new Buffer(5 + len);
+			buf[0] = 0x80 | this.sid;
+			buf[1] = 0x00 | 0x00 | len;
+			buf[2] = (address & 0x7f);
+			buf[3] = (address >> 7);
+			let offset = 4;
+			let sum = buf[2] + buf[3];
+			for (let d of data) {
+				buf[offset++] = d;
+				sum += d;
+			}
+			// checksum
+			buf[offset] = (-sum) & 0x7f;
+			this.serialWrite(buf);
+		};
+
 		Component.prototype.unlock = function() {
-			this.flashWrite(0x14, [0x55]);
+			this.ramWrite(0x14, [0x55]);
 		};
 
 		Component.prototype.motorToggle = function(on) {
-			this.flashWrite(0x3b, [on ? 1 : 0]);
+			this.ramWrite(0x3b, [on ? 1 : 0]);
 		};
 
 		Component.prototype.motorOn = function() {
@@ -104,7 +135,7 @@ export default function(five) {
 				console.warn(`tpos value is out of range. Please specify the value from ${FB_TPOS_DEFAULT_MIN} to ${FB_TPOS_DEFAULT_MAX}.`);
 				return;
 			}
-			this.flashWrite(0x30, [tpos & 0x7f, (tpos >> 7) & 0x7f]);
+			this.ramWrite(0x30, [tpos & 0x7f, (tpos >> 7) & 0x7f]);
 		};
 
 		Component.prototype.to = function(degree) {
@@ -114,6 +145,23 @@ export default function(five) {
 			}
 			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
 			this.move(tpos);
+		};
+
+		Component.prototype.setSid = function(newSid) {
+			if (newSid < 0 || newSid > 127) {
+				console.warn(`New sid is out of range. Please specify the value from 0 to 127.`);
+				return;
+			}
+			this.flashWrite(0x08, [newSid]);
+			console.log("You need to restart the V-SERVO to update sid.");
+		};
+
+		Component.prototype.getSid = function() {
+			this.ramRead(0x08, 1);
+		};
+
+		Component.prototype.reset = function() {
+			this.flashWrite(0x00, [0x3e8 & 0x7f, 0x3e8 >> 7]);
 		};
 
 		Component.prototype[Animation.render] = function(position) {
