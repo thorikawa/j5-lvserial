@@ -5,7 +5,7 @@ let LvSerial = require('../')(five);
 let board = new five.Board({});
 
 board.on('ready', () => {
-	let vservo = new LvSerial({
+	let servoController = new LvSerial({
 		pins: {
 			rx: 11,
 			tx: 10
@@ -13,6 +13,7 @@ board.on('ready', () => {
 		sid: 0,
 		repl: false
 	});
+	let vservo = servoController.servo(0);
 	setTimeout(() => {
 		vservo.unlock();
 	}, 200);
@@ -20,7 +21,7 @@ board.on('ready', () => {
 		vservo.getSid();
 	}, 1000);
 	setTimeout(() => {
-		vservo.setSid(1);
+		vservo.setSid(3);
 	}, 2000);
 	setTimeout(() => {
 		vservo.getSid();

@@ -5,14 +5,14 @@ let LvSerial = require('../')(five);
 let board = new five.Board({});
 
 board.on('ready', () => {
-	let vservo = new LvSerial({
+	let servoController = new LvSerial({
 		pins: {
 			rx: 11,
 			tx: 10
 		},
-		sid: 0,
 		repl: false
 	});
+	let vservo = servoController.servo(0);
 	setTimeout(() => {
 		vservo.unlock();
 	}, 200);

@@ -10,29 +10,33 @@ board.on('ready', () => {
 			rx: 11,
 			tx: 10
 		},
-		sid: 0,
 		repl: false
 	});
-	let vservo = servoController.servo(0);
-	let animation = new five.Animation(vservo);
+	let servos = servoController.servo([0, 1, 2, 3]);
+	let animation = new five.Animation(servos);
 
 	setTimeout(() => {
-		vservo.unlock();
+		servos.unlock();
 	}, 200);
 	setTimeout(() => {
 		console.log('motor on');
-		vservo.motorOn();
+		servos.motorOn();
 	}, 400);
 	setTimeout(() => {
 		animation.enqueue({
-			cuePoints: [0, 0.25, 0.75, 1],
-			keyFrames: [{ value: 180 }, { value: 200, easing: "inQuad" }, { value: 160, easing: "outQuad" }, { value: 180 }],
+			cuePoints: [0, 1],
+			keyFrames: [
+				[{ value: 180 }, { value: 190 }],
+				[{ value: 180 }, { value: 185 }],
+				[{ value: 180 }, { value: 170 }],
+				[{ value: 180 }, { value: 175 }],
+			],
 			duration: 10000,
 			fps: 30
   		});
 	}, 2000);
 	setTimeout(() => {
 		console.log('motor off');
-		vservo.motorOff();
+		servos.motorOff();
 	}, 16000);
 });
