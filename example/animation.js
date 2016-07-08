@@ -25,7 +25,7 @@ board.on('ready', () => {
 	setTimeout(() => {
 		animation.enqueue({
 			cuePoints: [0, 0.25, 0.75, 1],
-			keyFrames: [{ value: 90 }, { value: 300, easing: "inQuad" }, { value: 30, easing: "outQuad" }, { value: 90 }],
+			keyFrames: [{ value: 180 }, { value: 200, easing: "inQuad" }, { value: 160, easing: "outQuad" }, { value: 180 }],
 			duration: 10000,
 			fps: 30
   		});
