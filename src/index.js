@@ -56,7 +56,12 @@ export default function(five) {
 					// store received things in state object, use
 					// for emitting events 
 					// TODO
-					console.log(bytes);
+					let res = 0;
+					for (let i = bytes.length - 1; i >= 0; i--) {
+						res = (res << 7);
+						res += bytes[i];
+					}
+					console.log('read:' + res.toString(16));
 				});
 			});
 
