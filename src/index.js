@@ -226,7 +226,7 @@ export default function(five) {
 		}
 
 		getTemp() {
-			this.controller.ramRead(this.sid, 0x26, 1);
+			this.controller.ramRead(this.sid, 0x26, 2);
 		}
 
 		reset() {
