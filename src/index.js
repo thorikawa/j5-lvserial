@@ -77,7 +77,7 @@ export default function(five) {
 		}
 
 		serialWrite(bytes) {
-			console.log(bytes);
+			// console.log(bytes);
 			let state = priv.get(this);
 			this.io.serialWrite(state.portId, bytes);
 		}
