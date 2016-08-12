@@ -225,6 +225,10 @@ export default function(five) {
 			this.controller.ramRead(this.sid, 0x08, 1);
 		}
 
+		getTemp() {
+			this.controller.ramRead(this.sid, 0x26, 1);
+		}
+
 		reset() {
 			this.controller.flashWrite(this.sid, 0x00, [0x3e8 & 0x7f, 0x3e8 >> 7]);
 		}
