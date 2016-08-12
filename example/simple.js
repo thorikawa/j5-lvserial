@@ -12,7 +12,9 @@ board.on('ready', () => {
 		},
 		repl: false
 	});
-	let vservo = servoController.servo(0);
+	let vservo = servoController.servo(0, {
+		range: [170, 190]
+	});
 	setTimeout(() => {
 		vservo.unlock();
 	}, 200);

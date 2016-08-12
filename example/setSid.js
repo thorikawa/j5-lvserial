@@ -10,7 +10,6 @@ board.on('ready', () => {
 			rx: 11,
 			tx: 10
 		},
-		sid: 0,
 		repl: false
 	});
 	let vservo = servoController.servo(0);
@@ -21,7 +20,7 @@ board.on('ready', () => {
 		vservo.getSid();
 	}, 1000);
 	setTimeout(() => {
-		vservo.setSid(3);
+		vservo.setSid(2);
 	}, 2000);
 	setTimeout(() => {
 		vservo.getSid();

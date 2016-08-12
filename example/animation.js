@@ -10,10 +10,9 @@ board.on('ready', () => {
 			rx: 11,
 			tx: 10
 		},
-		sid: 0,
 		repl: false
 	});
-	let vservo = servoController.servo(0);
+	let vservo = servoController.servo(2);
 	let animation = new five.Animation(vservo);
 
 	setTimeout(() => {
@@ -26,8 +25,8 @@ board.on('ready', () => {
 	setTimeout(() => {
 		animation.enqueue({
 			cuePoints: [0, 0.25, 0.75, 1],
-			keyFrames: [{ value: 180 }, { value: 200, easing: "inQuad" }, { value: 160, easing: "outQuad" }, { value: 180 }],
-			duration: 10000,
+			keyFrames: [{ value: 180 }, { value: 200, easing: "inQuad" }, { value: 140, easing: "outQuad" }, { value: 180 }],
+			duration: 3000,
 			fps: 30
   		});
 	}, 2000);

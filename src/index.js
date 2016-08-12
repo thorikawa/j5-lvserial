@@ -65,14 +65,14 @@ export default function(five) {
 			});
 		}
 
-		servo(sid) {
+		servo(sid, option) {
 			if (Array.isArray(sid)) {
 				let servos = sid.map((s) => {
-					return new Servo(this, s);
+					return new Servo(this, s, option);
 				});
 				return new Servos(this, servos);
 			} else {
-				return new Servo(this, sid);
+				return new Servo(this, sid, option);
 			}
 		}
 
@@ -137,10 +137,10 @@ export default function(five) {
 	}
 
 	class Servo extends Emitter {
-		constructor(controller, sid) {
+		constructor(controller, sid, options) {
 			super();
 			if (!(this instanceof Servo)) {
-				return new Servo(controller, sid);
+				return new Servo(controller, sid, options);
 			}
 
 			// call Board.Compnent's constructor for 'this'
@@ -148,6 +148,17 @@ export default function(five) {
 
 			this.controller = controller;
 			this.sid = sid;
+			this.min = DEGREE_DEFAULT_MIN;
+			this.max = DEGREE_DEFAULT_MAX;
+
+			if (options.range) {
+				if (options.range.length < 2) {
+					console.warn('The length of options.range must be greater than or equal to two.');
+				} else {
+					this.min = options.range[0];
+					this.max = options.range[1];
+				}
+			}
 		}
 
 		unlock() {
@@ -176,10 +187,7 @@ export default function(five) {
 		}
 
 		to(degree) {
-			if (degree < DEGREE_DEFAULT_MIN || degree > DEGREE_DEFAULT_MAX) {
-				console.warn(`The degree is out of range. Please specify the value from ${DEGREE_DEFAULT_MIN} to ${DEGREE_DEFAULT_MAX}.`);
-				return;
-			}
+			degree = Fn.constrain(degree, this.min, this.max);
 			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
 			this.toTpos(tpos);
 		}
@@ -195,10 +203,7 @@ export default function(five) {
 		}
 
 		to_bst(degree) {
-			if (degree < DEGREE_DEFAULT_MIN || degree > DEGREE_DEFAULT_MAX) {
-				console.warn(`The degree is out of range. Please specify the value from ${DEGREE_DEFAULT_MIN} to ${DEGREE_DEFAULT_MAX}.`);
-				return;
-			}
+			degree = Fn.constrain(degree, this.min, this.max);
 			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
 			this.toTpos_bst(tpos);
 		}
