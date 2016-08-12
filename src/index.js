@@ -151,7 +151,7 @@ export default function(five) {
 			this.min = DEGREE_DEFAULT_MIN;
 			this.max = DEGREE_DEFAULT_MAX;
 
-			if (options.range) {
+			if (options !== undefined && options.range) {
 				if (options.range.length < 2) {
 					console.warn('The length of options.range must be greater than or equal to two.');
 				} else {
