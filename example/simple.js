@@ -23,6 +23,10 @@ board.on('ready', () => {
 		vservo.motorOn();
 	}, 400);
 	setTimeout(() => {
+		console.log('set PG');
+		vservo.setPG(0x05);
+	}, 600);
+	setTimeout(() => {
 		console.log('move to 160 degree');
 		vservo.to(160);
 	}, 2000);

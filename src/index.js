@@ -217,6 +217,10 @@ export default function(five) {
 			console.log("You need to restart the V-SERVO to update sid.");
 		}
 
+		setPG(newValue) {
+			this.controller.ramWrite(this.sid, 0x32, [newValue & 0x7f]);
+		}
+
 		getSid() {
 			this.controller.ramRead(this.sid, 0x08, 1);
 		}
