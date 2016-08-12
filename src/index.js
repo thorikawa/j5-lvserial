@@ -234,6 +234,26 @@ export default function(five) {
 			this.controller.ramRead(this.sid, 0x26, 2);
 		}
 
+		getSpeed() {
+			this.controller.ramRead(this.sid, 0x22, 2);
+		}
+
+		getPos() {
+			this.controller.ramRead(this.sid, 0x20, 2);
+		}
+
+		getBackEMF() {
+			this.controller.ramRead(this.sid, 0x24, 2);
+		}
+
+		getVoltage() {
+			this.controller.ramRead(this.sid, 0x28, 2);
+		}
+
+		getIERR() {
+			this.controller.ramRead(this.sid, 0x2a, 2);
+		}
+
 		reset() {
 			this.controller.flashWrite(this.sid, 0x00, [0x3e8 & 0x7f, 0x3e8 >> 7]);
 		}
