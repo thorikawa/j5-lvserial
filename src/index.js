@@ -5,8 +5,10 @@ const Collection = require('./collection');
 const util = require('util');
 const priv = new Map();
 
-const FB_TPOS_DEFAULT_MIN = 0x0200;
-const FB_TPOS_DEFAULT_MAX = 0x0e00;
+// const FB_TPOS_DEFAULT_MIN = 0x0200;
+// const FB_TPOS_DEFAULT_MAX = 0x0e00;
+const FB_TPOS_DEFAULT_MIN = 0x0300;
+const FB_TPOS_DEFAULT_MAX = 0x0d00;
 const FB_TPOS_DEFAULT_CENTER = 0x0800;
 const DEGREE_DEFAULT_MIN = 15;
 const DEGREE_DEFAULT_MAX = 345;
@@ -156,14 +158,24 @@ export default function(five) {
 			this.min = DEGREE_DEFAULT_MIN;
 			this.max = DEGREE_DEFAULT_MAX;
 
-			if (options !== undefined && options.range) {
-				if (options.range.length < 2) {
-					console.warn('The length of options.range must be greater than or equal to two.');
-				} else {
-					this.min = options.range[0];
-					this.max = options.range[1];
+			if (options !== undefined) {
+				if (options.range) {
+					if (options.range.length < 2) {
+						console.warn('The length of options.range must be greater than or equal to two.');
+					} else {
+						this.min = options.range[0];
+						this.max = options.range[1];
+						if (this.invert) {
+							this.max = 360 - this.min;
+							this.min = 360 - this.max;
+						}
+					}
 				}
+
+				this.invert = options.invert || false;
+				this.debug = options.debug || false;
 			}
+
 		}
 
 		unlock() {
@@ -193,6 +205,12 @@ export default function(five) {
 
 		to(degree) {
 			degree = Fn.constrain(degree, this.min, this.max);
+			if (this.invert) {
+				degree = 360 - degree;
+			}
+			if (this.debug) {
+				console.log('to', this.sid, degree);
+			}
 			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
 			this.toTpos(tpos);
 		}
@@ -209,6 +227,12 @@ export default function(five) {
 
 		to_bst(degree) {
 			degree = Fn.constrain(degree, this.min, this.max);
+			if (this.invert) {
+				degree = 360 - degree;
+			}
+			if (this.debug) {
+				console.log('to_bst', this.sid, degree);
+			}
 			let tpos = Fn.map(degree, DEGREE_DEFAULT_MIN, DEGREE_DEFAULT_MAX, FB_TPOS_DEFAULT_MIN, FB_TPOS_DEFAULT_MAX);
 			this.toTpos_bst(tpos);
 		}
